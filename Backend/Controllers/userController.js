@@ -1,9 +1,9 @@
 import asyncHandler from "express-async-handler";
-import User from "../Backend/Models/userModel.js";
-import genToken from "./tokenGen.js"; 
+import User from "../Models/userModel.js";
+import genToken from "../utils/tokenGen.js"; 
 import asynchandler from "express-async-handler";
 import bcrypt from "bcryptjs";
-import genToken from "../Backend/utils/tokenGen.js";
+
 // registeruser
 export const registerUser = asyncHandler(async (req, res) => {
     const { fullName, userName, email, password } = req.body;
