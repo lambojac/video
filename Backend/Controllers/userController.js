@@ -1,15 +1,14 @@
 import asyncHandler from "express-async-handler";
 import User from "../Models/userModel.js";
-import genToken from "../utils/tokenGen.js"; 
-import asynchandler from "express-async-handler";
+import genToken from "../utils/tokenGen.js";
 import bcrypt from "bcryptjs";
 
-// registeruser
+// Register User
 export const registerUser = asyncHandler(async (req, res) => {
     const { fullName, userName, email, password } = req.body;
 
     // Validate required fields
-    if (!fullName || !email || !password||!userName) {
+    if (!fullName || !email || !password || !userName) {
         res.status(400);
         throw new Error("Please provide all required fields.");
     }
@@ -21,12 +20,16 @@ export const registerUser = asyncHandler(async (req, res) => {
         throw new Error("User with this email already exists.");
     }
 
+    // Hash the password before storing
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     // Create a new user
     const user = await User.create({
         fullName,
         email,
-        password, 
-        phone_number,
+        password: hashedPassword,
+        userName
     });
 
     if (user) {
@@ -37,19 +40,18 @@ export const registerUser = asyncHandler(async (req, res) => {
         res.cookie("token", token, {
             path: "/",
             httpOnly: true,
-            expires: new Date(Date.now() + 1000 * 60 * 60 * 24), // Expires in 1 day
+            expires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day
             sameSite: "none",
-            secure: true, // Set to true if using HTTPS
+            secure: true,
         });
 
         res.status(201).json({
             id: user._id,
-            full_name: user.full_name,
+            fullName: user.fullName,
             email: user.email,
-            phone_number: user.phone_number,
+            userName: user.userName,
             createdAt: user.createdAt,
             token,
-            role
         });
     } else {
         res.status(400);
@@ -57,67 +59,65 @@ export const registerUser = asyncHandler(async (req, res) => {
     }
 });
 
+// Login User
+export const loginUser = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
 
+    // Validate required fields
+    if (!email || !password) {
+        res.status(400);
+        throw new Error("Please provide correct email and password.");
+    }
 
-// loginuser
-export const loginUser = asynchandler(async (req, res) => {
-  const { email, password } = req.body;
+    // Find user by email
+    const user = await User.findOne({ email });
 
-  // Validate required fields
-  if (!email || !password) {
-    res.status(400);
-    throw new Error("Please provide correct email and password.");
-  }
+    if (!user) {
+        res.status(400);
+        throw new Error("User not found, please sign up!");
+    }
 
-  // Find user by email
-  const user = await User.findOne({ email });
+    // Check password
+    const passwordIsValid = await bcrypt.compare(password, user.password);
 
-  if (!user) {
-    res.status(400);
-    throw new Error("User not found, Please sign up!");
-  }
+    if (passwordIsValid) {
+        // Generate token
+        const token = genToken(user._id);
 
-  // Check password
-  const passwordIsValid = await bcrypt.compare(password, user.password);
+        // Send cookie to server
+        res.cookie("token", token, {
+            path: "/",
+            httpOnly: true,
+            expires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day
+            sameSite: "none",
+            secure: true,
+        });
 
-  if (passwordIsValid) {
-    // Generate token
-    const token = genToken(user._id);
+        const { fullName, userName, email } = user;
 
-    // Send cookie to server
-    res.cookie("token", token, {
-      path: "/",
-      httpOnly: true,
-      expires: new Date(Date.now() + 1000 * 24 * 60 * 60), // Expires in 1 day
-      sameSite: "none",
-      secure: true,
-    });
-
-    const {
-        fullName, userName, email,
-    } = user;
-
-    // Include the user ID in the response
-    res.status(200).json({
-        fullName, userName, email,
-    });
-  } else {
-    res.status(400);
-    throw new Error("Invalid Email or password.");
-  }
-});
-// logout
-export const logOut = asynchandler(async (req, res) => {
-  // expire the session
-  res.cookie("token", "", {
-    path: "/",
-    httpOnly: true,
-    expires: new Date(),
-    sameSite: "none",
-    secure: true,
-  });
-  return res.status(200).json({ message: "you are Sucessfully logged out" });
+        // Include the user ID in the response
+        res.status(200).json({
+            id: user._id,
+            fullName,
+            userName,
+            email,
+            token,
+        });
+    } else {
+        res.status(400);
+        throw new Error("Invalid email or password.");
+    }
 });
 
-
-
+// Logout
+export const logOut = asyncHandler(async (req, res) => {
+    // Expire the session
+    res.cookie("token", "", {
+        path: "/",
+        httpOnly: true,
+        expires: new Date(),
+        sameSite: "none",
+        secure: true,
+    });
+    return res.status(200).json({ message: "You are successfully logged out." });
+});
