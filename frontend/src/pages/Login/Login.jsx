@@ -5,13 +5,13 @@ import "react-toastify/dist/ReactToastify.css";
 import "./Login.scss";
 
 const Login = () => {
-  const [identifier, setIdentifier] = useState(""); // Can be email or username
+  const [email, setEmail] = useState(""); // Can be email or username
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   // Check if user is already logged in
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    const token = localStorage.getItem("token");
     if (token) {
       navigate("/dashboard"); // Redirect logged-in users to dashboard
     }
@@ -20,30 +20,38 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     toast.dismiss();
-
+  
     try {
-      const response = await fetch("YOUR_LOGIN_API_ENDPOINT_HERE", {
+      const response = await fetch("http://localhost:2000/api/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ identifier, password }),
+        body: JSON.stringify({ email, password }),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Login failed");
-      }
-
+  
       const data = await response.json();
-      localStorage.setItem("authToken", data.token); // Store token
+  
+      if (!response.ok) {
+        if (data.message === "User not found, please sign up!") {
+          toast.error("User not found. Please check your email.");
+        } else if (data.message === "Invalid email or password.") {
+          toast.error("Incorrect password. Please try again.");
+        } else {
+          toast.error(data.detail || "Login failed. Please try again.");
+        }
+        return;
+      }
+  
+      localStorage.setItem("token", data.token); // Store token
       toast.success("Login successful!");
-
+  
       setTimeout(() => navigate("/dashboard"), 2000); // Redirect after 2 sec
     } catch (err) {
-      toast.error(err.message);
+      toast.error("Something went wrong. Please try again.");
     }
   };
+  
 
   return (
     <div className="login-container">
@@ -52,9 +60,9 @@ const Login = () => {
         <form onSubmit={handleLogin}>
           <input
             type="text"
-            placeholder="Email or Username"
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
           <input

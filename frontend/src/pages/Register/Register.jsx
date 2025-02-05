@@ -6,7 +6,7 @@ import "./Register.scss";
 
 const Register = () => {
   const [fullName, setFullName] = useState("");
-  const [username, setUsername] = useState("");
+  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -16,12 +16,12 @@ const Register = () => {
     toast.dismiss();
 
     try {
-      const response = await fetch("YOUR_API_ENDPOINT_HERE", {
+      const response = await fetch("http://localhost:2000/api/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ fullName, username, email, password }),
+        body: JSON.stringify({ fullName, userName, email, password }),
       });
 
       if (!response.ok) {
@@ -51,8 +51,8 @@ const Register = () => {
           <input
             type="text"
             placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
             required
           />
           <input
