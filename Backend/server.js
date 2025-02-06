@@ -4,7 +4,7 @@ import express from "express";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import { connectDB } from "./config/DbConn.js";
+import { connectDB } from "./Config/Dbconn.js";
 import userRouter from "./Routes/userRoutes.js";
 import errorHandler from "./Middlewares/errorMiddleWare.js";
 
