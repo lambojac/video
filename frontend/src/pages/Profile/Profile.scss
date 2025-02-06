@@ -101,6 +101,7 @@
           font-weight: bold;
         }
   
+        
         .search-input {
           display: flex;
           align-items: center;
@@ -230,7 +231,10 @@
       }
     }
   }
-  
+  a {
+    text-decoration: none; 
+    color: inherit; 
+  }
   @media (max-width: 480px) {
     .profile {
       .videos-section {

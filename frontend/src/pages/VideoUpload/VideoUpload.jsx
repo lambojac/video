@@ -1,5 +1,6 @@
 import React from "react";
 import "./VideoUpload.scss";
+import { Link } from "react-router-dom";
 import { FaHome, FaUserCircle, FaBell } from "react-icons/fa";
 import { FiHelpCircle } from "react-icons/fi";
 
@@ -16,10 +17,16 @@ const UploadVideos = () => {
   return (
     <div className="upload-videos">
       <header>
+      <Link to="/dashboard">
         <div className="left"><FaHome /> HOME</div>
+        </Link>
         <div className="right">
+        <Link to="/profile">
           <FaUserCircle className="icon" />
+          </Link>
+          <Link to="/notifications">
           <FaBell className="icon" />
+          </Link>
           <FiHelpCircle className="icon" /> HELP
         </div>
       </header>

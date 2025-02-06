@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { FaHome, FaUserCircle, FaBell, FaQuestionCircle, FaSearch } from "react-icons/fa";
 import "./Profile.scss";
 const Profile = () => {
@@ -6,10 +7,16 @@ const Profile = () => {
     <div className="profile">
       {/* Top Navigation */}
       <div className="top-nav">
+      <Link to="/dashboard">
         <FaHome className="home-icon" />
+        </Link>
         <div className="right-icons">
+        <Link to="/notifications">
           <FaBell className="icon" />
+          </Link>
+          <Link to="/profile">
           <FaUserCircle className="icon" />
+          </Link>
           <button className="help-btn">
             <FaQuestionCircle /> HELP
           </button>
@@ -40,6 +47,7 @@ const Profile = () => {
       </div>
 
       {/* Videos Section */}
+      <Link to="/upload">
       <div className="videos-section">
         <h3>MY VIDEOS</h3>
         <p className="video-category">UNIVERSITY ATHLETE FOREHAND (PRIVATE)</p>
@@ -54,7 +62,9 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      </Link>
     </div>
+    
   );
 };
 

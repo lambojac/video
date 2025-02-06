@@ -1,5 +1,6 @@
 import React from 'react';
 import { Home, Bell, UserCircle, HelpCircle } from 'lucide-react';
+import { Link } from "react-router-dom";
 import './Notifications.scss';
 
 const NotificationItem = ({ avatar, message, time, icon }) => (
@@ -65,18 +66,24 @@ const Notifications = () => {
     <div className="notifications-page">
       <header className="header">
         <div className="header-left">
-          <button className="btn-icon">
-            <Home size={20} />
-            <span>HOME</span>
-          </button>
+        <Link to="/dashboard">
+        <button className="btn-icon">
+          <Home size={20} />
+          <span>HOME</span>
+        </button>
+      </Link>
         </div>
         <div className="header-right">
+        <Link to="/notifications">
           <button className="btn-icon notification">
             <Bell size={20} />
           </button>
+        </Link>
+        <Link to="/profile">
           <button className="btn-icon profile">
             <UserCircle size={20} />
           </button>
+        </Link>
           <button className="btn-help">
             <HelpCircle size={20} />
             <span>HELP</span>

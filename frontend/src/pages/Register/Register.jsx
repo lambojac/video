@@ -16,7 +16,7 @@ const Register = () => {
     toast.dismiss();
 
     try {
-      const response = await fetch("http://localhost:2000/api/users/register", {
+      const response = await fetch("https://video-g4h9.onrender.com/api/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
