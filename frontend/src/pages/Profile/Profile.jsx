@@ -15,7 +15,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch(`http://localhost:2000/api/users/`, {
+        const response = await fetch(`https://video-g4h9.onrender.com/api/users/`, {
           method: "GET",
           credentials: "include",
           headers: {
@@ -48,7 +48,7 @@ const Profile = () => {
     formData.append(type, file);
   
     try {
-      const response = await fetch(`http://localhost:2000/api/upload/${type}/${userId}`, {
+      const response = await fetch(`https://video-g4h9.onrender.com/api/upload/${type}/${userId}`, {
         method: "POST",
         body: formData,
         credentials: 'include',
