@@ -7,7 +7,7 @@ import cookieParser from "cookie-parser";
 import { connectDB } from "./Config/Dbconn.js";
 import userRouter from "./Routes/userRoutes.js";
 import errorHandler from "./Middlewares/errorMiddleWare.js";
-
+import uploadRoutes from "./Routes/uploadRoutes.js"
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT;
@@ -16,7 +16,15 @@ const PORT = process.env.PORT;
 connectDB();
 
 //app middleware
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000', // Replace with your frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true // Add this
+  }));
+
+  
+  
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({extended: false}));
@@ -24,6 +32,7 @@ app.use(bodyParser.json());
 
 // routes middleware
 app.use("/api/users", userRouter);
+app.use("/api/upload",uploadRoutes)
 
 
 //route

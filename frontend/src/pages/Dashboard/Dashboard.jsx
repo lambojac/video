@@ -17,7 +17,7 @@ const Dashboard = () => {
         <Link to="/notifications">
         <FaBell className="icon" />
       </Link>
-      <Link to="/profile">
+      <Link to="/profile/:userId">
         <FaUserCircle className="icon" />
       </Link>
           <button className="help-btn">

@@ -29,7 +29,7 @@ function App() {
          <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/login" element={<Login/>}/> 
         <Route path="/" element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/:userId" element={<Profile />} />
       <Route path="/upload" element={<VideoUpload />} />
       <Route path="/anotation" element={<VideoAnalysis/>} /> 
       <Route path="/notifications" element={<Notifications /> }/>

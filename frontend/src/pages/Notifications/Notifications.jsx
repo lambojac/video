@@ -79,7 +79,7 @@ const Notifications = () => {
             <Bell size={20} />
           </button>
         </Link>
-        <Link to="/profile">
+        <Link to="/profile/:userId">
           <button className="btn-icon profile">
             <UserCircle size={20} />
           </button>

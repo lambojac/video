@@ -1,43 +1,71 @@
-import User from "../Models/userModel";
-
-// Upload Avatar (Profile Picture)
-export const profilePic = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    // Convert the image buffer to Base64
-    const avatar = req.file ? req.file.buffer.toString('base64') : null;
-
-    // Store the Base64 string in MongoDB
-    user.avatar = avatar;
-    await user.save();
-
-    res.json({ message: "Avatar uploaded successfully", avatar: user.avatar });
-  } catch (error) {
-    console.error("Error uploading avatar:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
+// Controllers/uploads.js
+import User from "../Models/userModel.js";
+import fs from 'fs';
+import cloudinary from "../Config/cloudinary.js";
 
 // Upload Banner
 export const banner = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const user = req.user;
+    console.log(user)
+    
+    if (!req.file) {
+      return res.status(400).json({ message: "No image file provided" });
+    }
 
-    // Convert the image buffer to Base64
-    const banner = req.file ? req.file.buffer.toString('base64') : null;
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "banners",
+      resource_type: "image",
+    });
 
-    // Store the Base64 string in MongoDB
-    user.banner = banner;
+    // Save Cloudinary URL to MongoDB
+    user.banner = result.secure_url;
     await user.save();
 
-    res.json({ message: "Banner uploaded successfully", banner: user.banner });
+    // Delete the temporary file
+    fs.unlinkSync(req.file.path);
+
+    res.json({
+      success: true,
+      message: "Banner uploaded successfully",
+      banner: result.secure_url,
+    });
   } catch (error) {
     console.error("Error uploading banner:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
+// Upload Profile Picture
+export const profilePic = async (req, res) => {
+  try {
+    const user = req.user;
+    
+    if (!req.file) {
+      return res.status(400).json({ message: "No image file provided" });
+    }
 
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "avatars",
+      resource_type: "image",
+    });
+
+    // Save Cloudinary URL to MongoDB
+    user.avatar = result.secure_url;
+    await user.save();
+
+    // Delete the temporary file
+    fs.unlinkSync(req.file.path);
+
+    res.json({
+      success: true,
+      message: "Avatar uploaded successfully",
+      avatar: result.secure_url,
+    });
+  } catch (error) {
+    console.error("Error uploading avatar:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

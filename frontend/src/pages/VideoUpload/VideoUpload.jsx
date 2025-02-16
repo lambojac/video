@@ -21,7 +21,7 @@ const UploadVideos = () => {
         <div className="left"><FaHome /> HOME</div>
         </Link>
         <div className="right">
-        <Link to="/profile">
+        <Link to="/profile/:userId">
           <FaUserCircle className="icon" />
           </Link>
           <Link to="/notifications">

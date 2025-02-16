@@ -14,6 +14,7 @@ const Register = () => {
   const handleSignUp = async (e) => {
     e.preventDefault();
     toast.dismiss();
+    //https://video-g4h9.onrender.com
 
     try {
       const response = await fetch("https://video-g4h9.onrender.com/api/users/register", {

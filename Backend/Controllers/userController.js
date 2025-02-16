@@ -121,3 +121,30 @@ export const logOut = asyncHandler(async (req, res) => {
     });
     return res.status(200).json({ message: "You are successfully logged out." });
 });
+// get userbyid
+export const getUserById = asyncHandler(async (req, res) => {
+  try {
+    // Extract user from auth middleware
+    const user = req.user;
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Fetch the user's details
+    const userData = await User.findById(user._id).select("userName email banner avatar fullName");
+
+    res.status(200).json({ 
+      success: true, 
+      message: "User successfully retrieved", 
+      data: userData 
+    });
+
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      message: "Internal server error", 
+      error: error.message 
+    });
+  }
+});
