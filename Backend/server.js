@@ -16,14 +16,14 @@ const PORT = process.env.PORT;
 connectDB();
 
 //app middleware
-app.use(cors({
-    origin: ['http://localhost:3000',"https://video-annotatio.vercel.app"],// Replace with your frontend URL
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true // Add this
-  }));
+// app.use(cors({
+//     origin: ['http://localhost:3000',"https://video-annotatio.vercel.app"],// Replace with your frontend URL
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     credentials: true // Add this
+//   }));
 
-  
+  app.use(cors())
   
 app.use(express.json());
 app.use(cookieParser());
