@@ -6,6 +6,9 @@ import "./Profile.scss";
 
 const Profile = () => {
   const { userId } = useParams();
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const { userName } = useParams(); 
   console.log(userId)
   const [user, setUser] = useState(null);
@@ -38,8 +41,72 @@ const Profile = () => {
   
     fetchUser();
   }, []);
-  
 
+// handle search
+const fetchSearchResults = async (query) => {
+  setIsLoading(true);
+  try {
+    const response = await fetch(`https://video-g4h9.onrender.com/api/users/search?search=${query}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem('token')}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error("Error searching users");
+    }
+
+    const data = await response.json();
+    setSearchResults(data.users);
+  } catch (error) {
+    console.error("Error searching users:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+// handle search
+const handleSearch = async () => {
+  setIsLoading(true);
+  try {
+    const response = await fetch(`https://video-g4h9.onrender.com/api/users/search?search=${searchQuery}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem('token')}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error("Error searching users");
+    }
+
+    const data = await response.json();
+    setSearchResults(data.users);
+  } catch (error) {
+    console.error("Error searching users:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+// Debounce Function
+useEffect(() => {
+  // If searchQuery is empty, clear results
+  if (searchQuery.trim() === "") {
+    setSearchResults([]);
+    return;
+  }
+
+  // Debouncing
+  const delayDebounce = setTimeout(() => {
+    fetchSearchResults(searchQuery);
+  }, 300); // Wait for 300ms
+
+  return () => clearTimeout(delayDebounce);
+}, [searchQuery]);
+  
+// file upload
   const handleFileUpload = async (e, type) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -140,15 +207,47 @@ const Profile = () => {
         </div>
       
 
-      <div className="search-bar">
-        <label>SEARCH FOR USERS:</label>
-        <div className="search-input">
-          <input type="text" placeholder="SEARCH HERE" />
-          <button>
-            <FaSearch />
-          </button>
-        </div>
+  <div className="search-bar">
+  <label>SEARCH FOR USERS:</label>
+  <div className="search-input">
+    <input
+      type="text"
+      placeholder="SEARCH HERE"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+    />
+    <button onClick={handleSearch}>
+      <FaSearch />
+    </button>
+  </div>
+</div>
+<div className="search-results">
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : (
+          searchResults.length > 0 ? (
+            searchResults.map(user => (
+              <Link to={`/profile/${user._id}`} key={user._id}>
+                <div className="search-item">
+                  {/* <img 
+                    src={user.avatar || '/default-avatar.jpg'} 
+                    alt={user.fullName} 
+                    className="avatar" 
+                  /> */}
+                  <span>{user.fullName}</span>
+                </div>
+              </Link>
+            ))
+          ) : (
+            searchQuery && <p>No users found.</p>
+          )
+        )}
       </div>
+    
+    
+
+
+
 
       {/* Videos Section */}
       <Link to="/upload">

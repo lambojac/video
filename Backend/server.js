@@ -8,6 +8,7 @@ import { connectDB } from "./Config/Dbconn.js";
 import userRouter from "./Routes/userRoutes.js";
 import errorHandler from "./Middlewares/errorMiddleWare.js";
 import uploadRoutes from "./Routes/uploadRoutes.js"
+import videoRoutes from "./Routes/videoRoutes.js"
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT;
@@ -33,6 +34,7 @@ app.use(bodyParser.json());
 // routes middleware
 app.use("/api/users", userRouter);
 app.use("/api/upload",uploadRoutes)
+app.use("/api/video",videoRoutes)
 
 
 //route

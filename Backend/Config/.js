@@ -78,3 +78,7 @@
 //     res.status(500).json({ message: "Server error" });
 //   }
 // };
+
+http://localhost:2000/api/video?privacy=private&page=1&limit=5
+
+http://localhost:2000/api/video/upload

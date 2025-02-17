@@ -148,3 +148,34 @@ export const getUserById = asyncHandler(async (req, res) => {
     });
   }
 });
+// search users
+export const searchUsers= async (req, res) => {
+  let { search } = req.query;
+
+  // If search is an array, take the first value and make sure it's a string
+  if (Array.isArray(search)) {
+      search = search[0];
+  }
+
+  // Ensure search is a string
+  if (typeof search !== 'string') {
+      search = '';
+  }
+
+  // Build the query object
+  const query= {};
+
+  // If search term is provided, filter by fullName or userName
+  if (search.trim()) {
+      query.$or = [
+          { fullName: { $regex: search, $options: 'i' } },
+          { userName: { $regex: search, $options: 'i' } }
+      ];
+  }
+
+  // Fetch users based on the query
+  const users = await User.find(query)
+      .select('fullName userName email avatar banner');
+
+  res.status(200).json({ users });
+}
