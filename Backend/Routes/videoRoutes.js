@@ -1,6 +1,6 @@
 import express from 'express';
 import  multer from 'multer';
-import {uploadVideo,getVideos} from '../controllers/videoController.js'
+import {uploadVideo,getVideos} from '../Controllers/videoController.js'
 import upload from '../Middlewares/videoMulter.js';
 const router = express.Router();
 
