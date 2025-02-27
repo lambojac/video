@@ -7,10 +7,7 @@ import Profile from './pages/Profile/Profile';
 import VideoUpload from './pages/VideoUpload/VideoUpload';
 import VideoAnalysis from './pages/VideoAnalysis/VideoAnalysis';
 import Notifications from './pages/Notifications/Notifications';
-// import Annotations from './pages/Annotations';
-
-
-// import Navbar from './components/Navbar';
+import Annotation from './pages/Annotation/Annotation';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -33,6 +30,7 @@ function App() {
       <Route path="/upload" element={<VideoUpload />} />
       <Route path="/anotation" element={<VideoAnalysis/>} /> 
       <Route path="/notifications" element={<Notifications /> }/>
+      <Route path="/annotation/:id" element={<Annotation /> }/>
          {/*  <Route path="/annotations" element={user ? <Annotations /> : <Navigate to="/login" />} />
         
         */} 

@@ -9,6 +9,7 @@ import userRouter from "./Routes/userRoutes.js";
 import errorHandler from "./Middlewares/errorMiddleWare.js";
 import uploadRoutes from "./Routes/uploadRoutes.js"
 import videoRoutes from "./Routes/videoRoutes.js"
+import annotation from "./Routes/annotation.js"
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT;
@@ -35,6 +36,7 @@ app.use(bodyParser.json());
 app.use("/api/users", userRouter);
 app.use("/api/upload",uploadRoutes)
 app.use("/api/video",videoRoutes)
+app.use("/api/annotation",annotation)
 
 
 //route

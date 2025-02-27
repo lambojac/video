@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from "react-router-dom";
-import { FaHome, FaUserCircle, FaBell } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { FaHome, FaUserCircle, FaBell, FaPen } from "react-icons/fa";
 import { FiHelpCircle } from "react-icons/fi";
 import "./VideoUpload.scss";
 
 const VideoUpload = () => {
+  const navigate = useNavigate();
   const [videos, setVideos] = useState([]);
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
@@ -13,6 +14,20 @@ const VideoUpload = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+
+// Function to handle video selection
+const handleVideoClick = (videoId) => {
+  setSelectedVideo(videoId);
+};
+
+// Function to navigate to annotation page
+const goToAnnotation = () => {
+  if (selectedVideo) {
+    navigate(`/annotation/${selectedVideo}`);
+  }
+};
+
 
   useEffect(() => {
     fetchVideos(currentPage);
@@ -65,6 +80,8 @@ const VideoUpload = () => {
       setLoading(false);
     }
   };
+
+  
 
   return (
     <div className="upload-videos">
@@ -160,17 +177,23 @@ const VideoUpload = () => {
           </div>
         )}
 
-        <div className="video-grid">
-          {videos.map((video, index) => (
-            <div className="video-card" key={index}>
-              <video src={video.url} controls />
-              <div className="video-info">
-                <p>{video.title}</p>
-                <span className="privacy-badge">{video.privacy}</span>
-              </div>
-            </div>
-          ))}
-        </div>
+<div className="video-grid">
+  {videos.map((video) => (
+    <div 
+      className="video-card" 
+      key={video._id} 
+      onClick={() => handleVideoClick(video._id)} // ✅ Select video on click
+      style={{ cursor: 'pointer', border: selectedVideo === video._id ? '2px solid blue' : 'none' }}
+    >
+      <video src={video.url} controls />
+      <div className="video-info">
+        <p>{video.title}</p>
+        <span className="privacy-badge">{video.privacy}</span>
+      </div>
+    </div>
+  ))}
+</div>
+
 
         {totalPages > 1 && (
           <div className="pagination">
@@ -192,7 +215,20 @@ const VideoUpload = () => {
 
         <div className="actions">
           <button className="tag-user">TAG USER</button>
-          <button className="add-analysis">ADD ANALYSIS</button>
+          {/* Add Analysis button inside .video-card */}
+          <div className="actions">
+  <button 
+    className="annotate-button"
+    onClick={goToAnnotation}
+    disabled={!selectedVideo} // ✅ Disable if no video is selected
+  >
+    <FaPen /> Add Analysis
+  </button>
+</div>
+
+
+
+
         </div>
       </div>
     </div>
