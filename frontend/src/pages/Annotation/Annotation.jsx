@@ -296,7 +296,7 @@ const Annotation = () => {
         y,
         text,
         startTime: currentTime,
-        endTime: currentTime + 5, // Default 5 seconds duration
+        endTime: currentTime + 1, // Default 5 seconds duration
         arrowStart: { x: x - 100, y: y - 50 },
         arrowEnd: { x, y },
         fontSize: fontSize // Store font size with annotation
