@@ -4,7 +4,6 @@ import upload from '../Middlewares/multer.js';
 import { banner, profilePic } from '../Controllers/uploads.js';
 import { protect } from '../Middlewares/auth.js';
 const router = express.Router();
-// Change :id to :userId for consistency
 router.post("/banner/:id", protect, upload.single("banner"), banner);
 router.post("/avatar/:id", protect, upload.single("avatar"), profilePic);
 export default router; 

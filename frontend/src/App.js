@@ -5,7 +5,7 @@ import Register from './pages/Register/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Profile from './pages/Profile/Profile';
 import VideoUpload from './pages/VideoUpload/VideoUpload';
-import VideoAnalysis from './pages/VideoAnalysis/VideoAnalysis';
+// import VideoAnalysis from './pages/VideoAnalysis/VideoAnalysis';
 import Notifications from './pages/Notifications/Notifications';
 import Annotation from './pages/Annotation/Annotation';
 
@@ -28,7 +28,7 @@ function App() {
         <Route path="/" element={<Register />} />
         <Route path="/profile/:userId" element={<Profile />} />
       <Route path="/upload" element={<VideoUpload />} />
-      <Route path="/anotation" element={<VideoAnalysis/>} /> 
+      {/* <Route path="/anotation" element={<VideoAnalysis/>} />  */}
       <Route path="/notifications" element={<Notifications /> }/>
       <Route path="/annotation/:id" element={<Annotation /> }/>
          {/*  <Route path="/annotations" element={user ? <Annotations /> : <Navigate to="/login" />} />

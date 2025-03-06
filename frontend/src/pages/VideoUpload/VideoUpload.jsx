@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { FaHome, FaUserCircle, FaBell, FaPen } from "react-icons/fa";
 import { FiHelpCircle } from "react-icons/fi";
+import VideoTagModal from '../Modal/Modal';
 import "./VideoUpload.scss";
 
 const VideoUpload = () => {
@@ -15,18 +16,19 @@ const VideoUpload = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
+  const [showTagModal, setShowTagModal] = useState(false);
 
-// Function to handle video selection
-const handleVideoClick = (videoId) => {
-  setSelectedVideo(videoId);
-};
+  // Function to handle video selection
+  const handleVideoClick = (videoId) => {
+    setSelectedVideo(videoId);
+  };
 
-// Function to navigate to annotation page
-const goToAnnotation = () => {
-  if (selectedVideo) {
-    navigate(`/annotation/${selectedVideo}`);
-  }
-};
+  // Function to navigate to annotation page
+  const goToAnnotation = () => {
+    if (selectedVideo) {
+      navigate(`/annotation/${selectedVideo}`);
+    }
+  };
 
 
   useEffect(() => {
@@ -65,7 +67,7 @@ const goToAnnotation = () => {
         method: 'POST',
         body: formData,
       });
-      
+
       if (!response.ok) {
         throw new Error('Upload failed');
       }
@@ -80,8 +82,12 @@ const goToAnnotation = () => {
       setLoading(false);
     }
   };
-
-  
+  //taguser
+  const handleTagUser = () => {
+    if (selectedVideo) {
+      setShowTagModal(true);
+    }
+  };
 
   return (
     <div className="upload-videos">
@@ -102,8 +108,8 @@ const goToAnnotation = () => {
 
       <div className="content">
         <h2>UPLOAD VIDEOS</h2>
-        
-        <button 
+
+        <button
           className="upload-button"
           onClick={() => setShowUploadModal(true)}
         >
@@ -142,7 +148,7 @@ const goToAnnotation = () => {
                       value="private"
                       checked={privacy === 'private'}
                       onChange={(e) => setPrivacy(e.target.value)}
-                    /> 
+                    />
                     PRIVATE
                   </label>
                   <label>
@@ -152,7 +158,7 @@ const goToAnnotation = () => {
                       value="public"
                       checked={privacy === 'public'}
                       onChange={(e) => setPrivacy(e.target.value)}
-                    /> 
+                    />
                     PUBLIC
                   </label>
                 </div>
@@ -177,22 +183,22 @@ const goToAnnotation = () => {
           </div>
         )}
 
-<div className="video-grid">
-  {videos.map((video) => (
-    <div 
-      className="video-card" 
-      key={video._id} 
-      onClick={() => handleVideoClick(video._id)} // ✅ Select video on click
-      style={{ cursor: 'pointer', border: selectedVideo === video._id ? '2px solid blue' : 'none' }}
-    >
-      <video src={video.url} controls />
-      <div className="video-info">
-        <p>{video.title}</p>
-        <span className="privacy-badge">{video.privacy}</span>
-      </div>
-    </div>
-  ))}
-</div>
+        <div className="video-grid">
+          {videos.map((video) => (
+            <div
+              className="video-card"
+              key={video._id}
+              onClick={() => handleVideoClick(video._id)} // ✅ Select video on click
+              style={{ cursor: 'pointer', border: selectedVideo === video._id ? '2px solid blue' : 'none' }}
+            >
+              <video src={video.url} controls />
+              <div className="video-info">
+                <p>{video.title}</p>
+                <span className="privacy-badge">{video.privacy}</span>
+              </div>
+            </div>
+          ))}
+        </div>
 
 
         {totalPages > 1 && (
@@ -214,23 +220,26 @@ const goToAnnotation = () => {
         )}
 
         <div className="actions">
-          <button className="tag-user">TAG USER</button>
+          <button className="tag-user" onClick={handleTagUser}
+            disabled={!selectedVideo}>TAG USER</button>
           {/* Add Analysis button inside .video-card */}
           <div className="actions">
-  <button 
-    className="annotate-button"
-    onClick={goToAnnotation}
-    disabled={!selectedVideo} // ✅ Disable if no video is selected
-  >
-    <FaPen /> Add Analysis
-  </button>
-</div>
-
-
-
-
+            <button
+              className="annotate-button"
+              onClick={goToAnnotation}
+              disabled={!selectedVideo} // ✅ Disable if no video is selected
+            >
+              <FaPen /> Add Analysis
+            </button>
+          </div>
         </div>
       </div>
+      {showTagModal && (
+        <VideoTagModal
+          videoId={selectedVideo}
+          onClose={() => setShowTagModal(false)}
+        />
+      )}
     </div>
   );
 };

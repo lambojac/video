@@ -10,6 +10,7 @@ import errorHandler from "./Middlewares/errorMiddleWare.js";
 import uploadRoutes from "./Routes/uploadRoutes.js"
 import videoRoutes from "./Routes/videoRoutes.js"
 import annotation from "./Routes/annotation.js"
+import NotificationRoutes from "./Routes/Notification.js"
 const app = express();
 dotenv.config();
 const PORT = process.env.PORT;
@@ -22,7 +23,7 @@ app.use(cors({
     origin: ['http://localhost:3000',"https://video-annotatio.vercel.app"],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true // Add this
+    credentials: true 
   }));
 
 
@@ -37,6 +38,7 @@ app.use("/api/users", userRouter);
 app.use("/api/upload",uploadRoutes)
 app.use("/api/video",videoRoutes)
 app.use("/api/annotation",annotation)
+app.use("/api/notification",NotificationRoutes)
 
 
 //route

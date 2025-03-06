@@ -1,119 +1,162 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Home, Bell, UserCircle, HelpCircle } from 'lucide-react';
 import { Link } from "react-router-dom";
 import './Notifications.scss';
 
-const NotificationItem = ({ avatar, message, time, icon }) => (
-  <div className="notification-item">
-    <div className="notification-left">
-      <img src={avatar} alt="User avatar" className="avatar" />
-      <div className="notification-content">
-        <p className="message">{message}</p>
-        <span className="time">{time}</span>
-      </div>
+const NotificationItem = ({ message, time, icon, isNew }) => (
+  <div className={`notification-item ${isNew ? 'new' : ''}`}>
+    <div className="notification-content">
+      <p className="message">{message}</p>
+      <span className="time">{time}</span>
     </div>
-    <div className="notification-right">
-      <img src={icon} alt="Notification icon" className="notification-icon" />
+    <div className="notification-icon">
+      {icon}
     </div>
   </div>
 );
 
 const Notifications = () => {
-  const notifications = [
-    {
-      id: 1,
-      avatar: "/coach-avatar.jpg",
-      message: "COACH 1 HAS TAGGED YOU IN A VIDEO",
-      time: "15 minutes ago",
-      icon: "/video-icon.jpg",
-      isNew: true
-    },
-    {
-      id: 2,
-      avatar: "/event-avatar.jpg",
-      message: "2 WEEKS UNTIL NATIONAL QUALIFIES",
-      time: "15 minutes ago",
-      icon: "/event-icon.jpg",
-      isNew: true
-    },
-    {
-      id: 3,
-      avatar: "/coach-avatar.jpg",
-      message: "COACH 1 HAS TAGGED YOU IN A VIDEO",
-      time: "30 minutes ago",
-      icon: "/video-icon.jpg",
-      isNew: false
-    },
-    {
-      id: 4,
-      avatar: "/coach-avatar.jpg",
-      message: "COACH 1 HAS TAGGED YOU IN A VIDEO",
-      time: "4 days ago",
-      icon: "/video-icon.jpg",
-      isNew: false
-    },
-    {
-      id: 5,
-      avatar: "/coach-avatar.jpg",
-      message: "COACH 1 HAS TAGGED YOU IN A VIDEO",
-      time: "5 days ago",
-      icon: "/video-icon.jpg",
-      isNew: false
-    }
-  ];
+  const [notifications, setNotifications] = useState({
+    newNotifications: [],
+    olderNotifications: [],
+    unreadCount: 0
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        setIsLoading(true);
+        const token = localStorage.getItem('token'); // Retrieve token from localStorage
+    
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+    
+        const response = await fetch(`https://video-g4h9.onrender.com/api/notification/notifications`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // Add token to Authorization header
+          }
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setNotifications({
+          newNotifications: data.newNotifications || [],
+          olderNotifications: data.olderNotifications || [],
+          unreadCount: data.unreadCount || 0
+        });
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="notifications-page">
+        <header className="header">
+          {/* Existing header code */}
+        </header>
+        <main className="main-content">
+          <div className="loading">Loading notifications...</div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="notifications-page">
+        <header className="header">
+          {/* Existing header code */}
+        </header>
+        <main className="main-content">
+          <div className="error">Error: {error}</div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="notifications-page">
       <header className="header">
         <div className="header-left">
-        <Link to="/dashboard">
-        <button className="btn-icon">
-          <Home size={20} />
-          <span>HOME</span>
-        </button>
-      </Link>
+          <Link to="/dashboard">
+            <button className="btn-icon">
+              <Home size={20} />
+              <span>HOME</span>
+            </button>
+          </Link>
         </div>
         <div className="header-right">
-        <Link to="/notifications">
-          <button className="btn-icon notification">
-            <Bell size={20} />
-          </button>
-        </Link>
-        <Link to="/profile/:userId">
-          <button className="btn-icon profile">
-            <UserCircle size={20} />
-          </button>
-        </Link>
+          <Link to="/notifications">
+            <button className="btn-icon notification">
+              <Bell size={20} />
+              {notifications.unreadCount > 0 && (
+                <span className="notification-badge">
+                  {notifications.unreadCount}
+                </span>
+              )}
+            </button>
+          </Link>
+          <Link to="/profile/:userId">
+            <button className="btn-icon profile">
+              <UserCircle size={20} />
+            </button>
+          </Link>
           <button className="btn-help">
             <HelpCircle size={20} />
             <span>HELP</span>
           </button>
         </div>
       </header>
-
       <main className="main-content">
         <div className="title-section">
           <Bell size={24} className="bell-icon" />
           <h1>NOTIFICATIONS</h1>
         </div>
-
         <div className="notifications-section">
-          <h2>NEW NOTIFICATIONS</h2>
-          <div className="notifications-list">
-            {notifications
-              .filter(notif => notif.isNew)
-              .map(notification => (
-                <NotificationItem key={notification.id} {...notification} />
-              ))}
-          </div>
-
+          {notifications.newNotifications.length > 0 && (
+            <>
+              <h2>NEW NOTIFICATIONS</h2>
+              <div className="notifications-list">
+                {notifications.newNotifications.map(notification => (
+                  <NotificationItem
+                    key={notification._id}
+                    message={notification.content}
+                    time={new Date(notification.createdAt).toLocaleString()}
+                    isNew={true}
+                    icon={<Bell />}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+         
           <h2>OLDER NOTIFICATIONS</h2>
           <div className="notifications-list">
-            {notifications
-              .filter(notif => !notif.isNew)
-              .map(notification => (
-                <NotificationItem key={notification.id} {...notification} />
-              ))}
+            {notifications.olderNotifications.map(notification => (
+              <NotificationItem
+                key={notification._id}
+                message={notification.content}
+                time={new Date(notification.createdAt).toLocaleString()}
+                isNew={false}
+                icon={<Bell />}
+              />
+            ))}
           </div>
         </div>
       </main>

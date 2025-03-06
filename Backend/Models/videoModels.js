@@ -15,7 +15,8 @@ const annotationSchema = new mongoose.Schema({
   arrowEnd: {
     x: { type: Number, required: true },
     y: { type: Number, required: true }
-  }
+  },
+  fontSize: { type: Number, default: 24 }
 });
 
 // videoschema
@@ -27,7 +28,13 @@ const videoSchema = new mongoose.Schema({
   url: { type: String, required: true },
   public_id: { type: String, required: true },
   privacy: { type: String, enum: ['public', 'private'], required: true },
-  uploadedAt: { type: Date, default: Date.now }
+  uploadedAt: { type: Date, default: Date.now },
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  tags: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    taggedAt: { type: Date, default: Date.now }
+  }],
+  
 });
 
 export default  mongoose.model('Video', videoSchema);
