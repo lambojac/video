@@ -20,7 +20,7 @@ connectDB();
 
 //app middleware
 app.use(cors({
-    origin: ['http://localhost:3000',"https://video-annotatio.vercel.app"],
+    origin: ['http://localhost:3000','http://localhost:3001',"https://video-annotatio.vercel.app"],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true 
