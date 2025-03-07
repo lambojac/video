@@ -22,7 +22,7 @@ const Login = () => {
     toast.dismiss();
   
     try {
-      const response = await fetch("https://video-g4h9.onrender.com/api/users/login", {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/users/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

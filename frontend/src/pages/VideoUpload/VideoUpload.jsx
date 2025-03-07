@@ -38,7 +38,7 @@ const VideoUpload = () => {
   const fetchVideos = async (page) => {
     try {
       const response = await fetch(
-        `https://video-g4h9.onrender.com/api/video?page=${page}&limit=6&privacy=${privacy}`
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/api/video?page=${page}&limit=6&privacy=${privacy}`
       );
       const data = await response.json();
       setVideos(data.videos);
@@ -63,7 +63,7 @@ const VideoUpload = () => {
     formData.append('privacy', privacy);
 
     try {
-      const response = await fetch('https://video-g4h9.onrender.com/api/video/upload', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/video/upload`, {
         method: 'POST',
         body: formData,
       });
