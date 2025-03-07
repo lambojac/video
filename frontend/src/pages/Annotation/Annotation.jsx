@@ -28,7 +28,7 @@ const Annotation = () => {
   useEffect(() => {
     const fetchVideoDetails = async () => {
       try {
-        const response = await fetch(`https://video-g4h9.onrender.com/api/annotation/${id}`);
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/annotation/${id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch video details');
         }
@@ -481,7 +481,7 @@ const Annotation = () => {
         ...anno,
         // Ensure arrow start/end points are explicitly defined
         arrowStart: anno.arrowStart || { x: anno.x - 100, y: anno.y - 50 },
-        arrowEnd: { x: anno.x, y: anno.y },
+        arrowEnd: anno.arrowEnd || { x: anno.x, y: anno.y },
         // Include font size with each annotation
         fontSize: anno.fontSize || fontSize,
         // Add style properties for server-side rendering
@@ -504,7 +504,7 @@ const Annotation = () => {
       };
       
       // Send to server
-      const response = await fetch('https://video-g4h9.onrender.com/api/annotation/annotate', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/annotation/annotate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

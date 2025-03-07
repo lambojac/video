@@ -55,6 +55,70 @@ export const annotateVideo = async (req, res) => {
       
       // Create FFmpeg filter commands for each annotation
       // Escape special characters in the text to prevent FFmpeg errors
+      // This is a sample of anno: see that i have added the arrow start and arrow end coordinates
+      // what you need to do is include in your ffmpeg command to also draw the arrow
+      // also use the style and background color directly from this object, no need of this part of your ffmpeg command (fontsize=24:fontcolor=white:borderw=2:bordercolor=black)
+      /**
+      * {
+       "id":"67cac8c8cccbc5b89a27ec8e",
+      "annotations":[
+          {
+            "id":1741343634351,
+            "x":195,
+            "y":181.5625,
+            "text":"testing",
+            "startTime":0.885786,
+            "endTime":1.885786,
+            "arrowStart":{
+                "x":95,
+                "y":131.5625
+            },
+            "arrowEnd":{
+                "x":195,
+                "y":181.5625
+            },
+            "fontSize":14,
+            "style":{
+                "backgroundColor":"rgba(64, 64, 64, 0.9)",
+                "textColor":"white",
+                "arrowColor":"white",
+                "padding":10,
+                "borderRadius":15,
+                "maxWidth":200
+            }
+          },
+          {
+            "id":1741343646607,
+            "x":176,
+            "y":166.5625,
+            "text":"new annotation",
+            "startTime":2.652487,
+            "endTime":3.652487,
+            "arrowStart":{
+                "x":76,
+                "y":116.5625
+            },
+            "arrowEnd":{
+                "x":176,
+                "y":166.5625
+            },
+            "fontSize":14,
+            "style":{
+                "backgroundColor":"rgba(64, 64, 64, 0.9)",
+                "textColor":"white",
+                "arrowColor":"white",
+                "padding":10,
+                "borderRadius":15,
+                "maxWidth":200
+            }
+          }
+      ],
+      "title":"Testing",
+      "originalUrl":"https://res.cloudinary.com/dd4gefva4/video/upload/v1741342918/videos/y61fcqmh4dhxiwckka47.mp4"
+    }
+       * 
+       * 
+       */
       let filterCommands = annotations.map(anno => {
         const escapedText = anno.text.replace(/[\\':]/g, '\\$&');
         return `drawtext=text='${escapedText}':x=${anno.x}:y=${anno.y}:fontsize=24:fontcolor=white:borderw=2:bordercolor=black:enable='between(t,${anno.startTime},${anno.endTime})'`;

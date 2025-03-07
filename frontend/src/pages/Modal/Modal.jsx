@@ -8,7 +8,7 @@ const VideoTagModal = ({ videoId, onClose }) => {
   useEffect(() => {
     const fetchTaggableUsers = async () => {
       try {
-        const response = await fetch('https://video-g4h9.onrender.com/api/notification/tagable-users');
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/notification/tagable-users`);
         const data = await response.json();
         setUsers(data);
       } catch (error) {
@@ -22,7 +22,7 @@ const VideoTagModal = ({ videoId, onClose }) => {
   const handleTagUser = async (userId) => {
     setLoading(true);
     try {
-      const response = await fetch(`https://video-g4h9.onrender.com/api/notification/${videoId}/tag`,{
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/notification/${videoId}/tag`,{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

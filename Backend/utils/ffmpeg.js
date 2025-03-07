@@ -1,12 +1,19 @@
+// import ffmpeg from 'fluent-ffmpeg';
+import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import ffmpeg from 'fluent-ffmpeg';
+
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+
+
+
 const runFFmpegProcess = (inputPath, outputPath, filterCommands) => {
     return new Promise((resolve, reject) => {
       // Construct the FFmpeg command with filter_complex
       let ffmpegCommand;
-      
+      console.log("command", filterCommands);
       if (filterCommands) {
         ffmpegCommand = ffmpeg(inputPath)
-          .videoFilters(filterCommands.split(','))
+          .videoFilters(filterCommands)
           .outputOptions('-c:a copy')  // Copy audio codec
           .output(outputPath)
           .on('end', () => {

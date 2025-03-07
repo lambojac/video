@@ -18,7 +18,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch(`https://video-g4h9.onrender.com/api/users/`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/users/`, {
           method: "GET",
           credentials: "include",
           headers: {
@@ -46,7 +46,7 @@ const Profile = () => {
 const fetchSearchResults = async (query) => {
   setIsLoading(true);
   try {
-    const response = await fetch(`https://video-g4h9.onrender.com/api/users/search?search=${query}`, {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/users/search?search=${query}`, {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${localStorage.getItem('token')}`,
@@ -70,7 +70,7 @@ const fetchSearchResults = async (query) => {
 const handleSearch = async () => {
   setIsLoading(true);
   try {
-    const response = await fetch(`https://video-g4h9.onrender.com/api/users/search?search=${searchQuery}`, {
+    const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/users/search?search=${searchQuery}`, {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${localStorage.getItem('token')}`,
@@ -115,7 +115,7 @@ useEffect(() => {
     formData.append(type, file);
   
     try {
-      const response = await fetch(`https://video-g4h9.onrender.com/api/upload/${type}/${userId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/upload/${type}/${userId}`, {
         method: "POST",
         body: formData,
         credentials: 'include',
