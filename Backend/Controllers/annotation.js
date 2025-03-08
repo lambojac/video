@@ -5,7 +5,16 @@ import runFFmpegProcess from '../utils/ffmpeg.js'
 import  fs from 'fs';
 import  path from 'path';
 import  os from 'os';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import https from "https"
+import { spawn } from 'child_process';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+
+const pythonScriptPath = path.join(__dirname, 'script/video-annotator.py');
 
 export const getVideoById = async (req, res) => {
   try {
@@ -20,126 +29,60 @@ export const getVideoById = async (req, res) => {
   }
 };
 
-// Process and save annotated video
 export const annotateVideo = async (req, res) => {
   try {
     const { id, annotations, title, originalUrl } = req.body;
-   
+
     if (!id || !annotations || !annotations.length) {
       return res.status(400).json({ message: 'Video ID and annotations are required' });
     }
-   
-    // Get the video from database
+
     const video = await Video.findById(id);
     if (!video) {
       return res.status(404).json({ message: 'Video not found' });
     }
-   
-    // Create temp directory for processing
+
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'annotation-'));
     const tempVideoPath = path.join(tempDir, 'original.mp4');
     const outputPath = path.join(tempDir, 'annotated.mp4');
-   
-    console.log(`Processing video: ${id}`);
-    console.log(`Original URL: ${originalUrl}`);
-    console.log(`Temp video path: ${tempVideoPath}`);
     
-    try {
-      // Download video directly using the URL
-      await downloadFromCloudinary(originalUrl, tempVideoPath);
-      
-      // Verify the file was downloaded successfully
-      if (!fs.existsSync(tempVideoPath) || fs.statSync(tempVideoPath).size === 0) {
-        throw new Error('Downloaded file is empty or does not exist');
-      }
-      
-      // Create FFmpeg filter commands for each annotation
-      // Escape special characters in the text to prevent FFmpeg errors
-      // This is a sample of anno: see that i have added the arrow start and arrow end coordinates
-      // what you need to do is include in your ffmpeg command to also draw the arrow
-      // also use the style and background color directly from this object, no need of this part of your ffmpeg command (fontsize=24:fontcolor=white:borderw=2:bordercolor=black)
-      /**
-      * {
-       "id":"67cac8c8cccbc5b89a27ec8e",
-      "annotations":[
-          {
-            "id":1741343634351,
-            "x":195,
-            "y":181.5625,
-            "text":"testing",
-            "startTime":0.885786,
-            "endTime":1.885786,
-            "arrowStart":{
-                "x":95,
-                "y":131.5625
-            },
-            "arrowEnd":{
-                "x":195,
-                "y":181.5625
-            },
-            "fontSize":14,
-            "style":{
-                "backgroundColor":"rgba(64, 64, 64, 0.9)",
-                "textColor":"white",
-                "arrowColor":"white",
-                "padding":10,
-                "borderRadius":15,
-                "maxWidth":200
-            }
-          },
-          {
-            "id":1741343646607,
-            "x":176,
-            "y":166.5625,
-            "text":"new annotation",
-            "startTime":2.652487,
-            "endTime":3.652487,
-            "arrowStart":{
-                "x":76,
-                "y":116.5625
-            },
-            "arrowEnd":{
-                "x":176,
-                "y":166.5625
-            },
-            "fontSize":14,
-            "style":{
-                "backgroundColor":"rgba(64, 64, 64, 0.9)",
-                "textColor":"white",
-                "arrowColor":"white",
-                "padding":10,
-                "borderRadius":15,
-                "maxWidth":200
-            }
-          }
-      ],
-      "title":"Testing",
-      "originalUrl":"https://res.cloudinary.com/dd4gefva4/video/upload/v1741342918/videos/y61fcqmh4dhxiwckka47.mp4"
+    await downloadFromCloudinary(originalUrl, tempVideoPath);
+
+    if (!fs.existsSync(tempVideoPath) || fs.statSync(tempVideoPath).size === 0) {
+      throw new Error('Downloaded file is empty or does not exist');
     }
-       * 
-       * 
-       */
-      let filterCommands = annotations.map(anno => {
-        const escapedText = anno.text.replace(/[\\':]/g, '\\$&');
-        return `drawtext=text='${escapedText}':x=${anno.x}:y=${anno.y}:fontsize=24:fontcolor=white:borderw=2:bordercolor=black:enable='between(t,${anno.startTime},${anno.endTime})'`;
-      }).join(',');
-      
-      // Process video with FFmpeg
-      await runFFmpegProcess(tempVideoPath, outputPath, filterCommands);
-      
-      // Check if the output file was created successfully
-      if (!fs.existsSync(outputPath) || fs.statSync(outputPath).size === 0) {
-        throw new Error('FFmpeg output file is empty or does not exist');
+
+    const annotationsData = annotations.map(anno => ({
+      ...anno,
+      startTime: parseFloat(anno.startTime),
+      endTime: parseFloat(anno.endTime)
+    }));
+
+    const pythonProcess = spawn('python3.10', [pythonScriptPath, tempVideoPath, outputPath, JSON.stringify(annotationsData)]);
+    
+    pythonProcess.stdout.on('data', (data) => {
+      console.log(`Python stdout: ${data}`);
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+      console.error(`Python stderr: ${data}`);
+    });
+
+    pythonProcess.on('close', async (code) => {
+      if (code !== 0) {
+        return res.status(500).json({ message: 'Error occurred during video processing' });
       }
-      
-      // Upload processed video to Cloudinary
+
+      if (!fs.existsSync(outputPath) || fs.statSync(outputPath).size === 0) {
+        return res.status(500).json({ message: 'Processed video file is empty or does not exist' });
+      }
+
       const uploadResult = await cloudinary.uploader.upload(outputPath, {
         resource_type: 'video',
         folder: 'annotated_videos',
         public_id: `annotated_${video._id}_${Date.now()}`
       });
-      
-      // Create a new annotated video record or update existing one
+
       const annotatedVideo = await Video.findOneAndUpdate(
         { originalVideoId: id },
         {
@@ -153,21 +96,15 @@ export const annotateVideo = async (req, res) => {
         },
         { new: true, upsert: true }
       );
-      
-      // Clean up temp files
+
       fs.rmSync(tempDir, { recursive: true, force: true });
-      
+
       res.json({
         success: true,
         video: annotatedVideo
       });
-    } catch (error) {
-      // Clean up temp directory in case of error
-      if (fs.existsSync(tempDir)) {
-        fs.rmSync(tempDir, { recursive: true, force: true });
-      }
-      throw error;
-    }
+    });
+
   } catch (error) {
     console.error('Error processing annotation:', error);
     res.status(500).json({ message: 'Error processing annotation', error: error.message });
