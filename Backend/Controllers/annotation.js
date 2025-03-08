@@ -8,7 +8,7 @@ import  os from 'os';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import https from "https"
-import { spawn } from 'child_process';
+import { spawn, exec } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -44,6 +44,7 @@ export const annotateVideo = async (req, res) => {
 
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'annotation-'));
     const tempVideoPath = path.join(tempDir, 'original.mp4');
+    const temp2VideoPath = path.join(tempDir, 'temp2.mp4');
     const outputPath = path.join(tempDir, 'annotated.mp4');
     
     await downloadFromCloudinary(originalUrl, tempVideoPath);
@@ -77,7 +78,19 @@ export const annotateVideo = async (req, res) => {
         return res.status(500).json({ message: 'Processed video file is empty or does not exist' });
       }
 
-      const uploadResult = await cloudinary.uploader.upload(outputPath, {
+      const ffmpegCommand = `ffmpeg -i ${outputPath} -c:v libx264 -c:a aac -strict experimental ${temp2VideoPath}`;
+      
+      await new Promise((resolve, reject) => {
+        exec(ffmpegCommand, (error, stdout, stderr) => {
+          if (error) {
+            reject(`Error processing video: ${stderr}`);
+          } else {
+            resolve(stdout);
+          }
+        });
+      });
+
+      const uploadResult = await cloudinary.uploader.upload(temp2VideoPath, {
         resource_type: 'video',
         folder: 'annotated_videos',
         public_id: `annotated_${video._id}_${Date.now()}`
