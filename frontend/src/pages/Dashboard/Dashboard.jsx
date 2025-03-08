@@ -38,25 +38,25 @@ const Dashboard = () => {
         <main className="main">
           <h3>HOME PAGE</h3>
           <div className="cards">
-          <Link to="/anotation">
+          <Link to="/upload">
             <div className="card">
               <IoIosFootball className="card-icon" />
               <p>UPCOMING MATCHES</p>
             </div>
             </Link>
-            <Link to="/anotation">
+            <Link to="/upload">
             <div className="card">
               <GiBoxingGloveSurprise className="card-icon" />
               <p>TOUGH OPPONENTS</p>
             </div>
             </Link>
-            <Link to="/anotation">
+            <Link to="/upload">
             <div className="card active">
               <MdOutlineVideoLibrary className="card-icon" />
               <p>VIDEO ANALYSIS</p>
             </div>
             </Link>
-            <Link to="/anotation">
+            <Link to="/upload">
             <div className="card">
               <IoIosFootball className="card-icon" />
               <p>RECENT COACHING POINTS</p>
