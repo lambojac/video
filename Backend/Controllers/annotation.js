@@ -77,18 +77,23 @@ export const annotateVideo = async (req, res) => {
       if (!fs.existsSync(outputPath) || fs.statSync(outputPath).size === 0) {
         return res.status(500).json({ message: 'Processed video file is empty or does not exist' });
       }
-
-      const ffmpegCommand = `ffmpeg -i ${outputPath} -c:v libx264 -c:a aac -strict experimental ${temp2VideoPath}`;
-      
-      await new Promise((resolve, reject) => {
-        exec(ffmpegCommand, (error, stdout, stderr) => {
-          if (error) {
-            reject(`Error processing video: ${stderr}`);
-          } else {
-            resolve(stdout);
-          }
+      try {
+        const ffmpegCommand = `ffmpeg -i ${outputPath} -c:v libx264 -c:a aac -strict experimental ${temp2VideoPath}`;
+        
+        await new Promise((resolve, reject) => {
+          exec(ffmpegCommand, (error, stdout, stderr) => {
+            if (error) {
+              reject(`Error processing video: ${stderr}`);
+            } else {
+              resolve(stdout);
+            }
+          });
         });
-      });
+        
+      } catch (error) {
+        console.error('Error processing video:', error);
+        throw new Error(`Video processing failed: ${error.message}`);
+      }
 
       const uploadResult = await cloudinary.uploader.upload(temp2VideoPath, {
         resource_type: 'video',
