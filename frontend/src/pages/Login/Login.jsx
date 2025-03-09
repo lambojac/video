@@ -7,6 +7,7 @@ import "./Login.scss";
 const Login = () => {
   const [email, setEmail] = useState(""); // Can be email or username
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   // Check if user is already logged in
@@ -20,7 +21,8 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     toast.dismiss();
-  
+    setIsLoading(true); // Set loading to true when login is attempted
+
     try {
       const response = await fetch("https://video-g4h9.onrender.com/api/users/login", {
         method: "POST",
@@ -29,9 +31,9 @@ const Login = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         if (data.message === "User not found, please sign up!") {
           toast.error("User not found. Please check your email.");
@@ -40,18 +42,19 @@ const Login = () => {
         } else {
           toast.error(data.detail || "Login failed. Please try again.");
         }
+        setIsLoading(false); // Set loading to false when there's an error
         return;
       }
-  
+
       localStorage.setItem("token", data.token); // Store token
       toast.success("Login successful!");
-  
+
       setTimeout(() => navigate("/dashboard"), 2000); // Redirect after 2 sec
     } catch (err) {
       toast.error("Something went wrong. Please try again.");
+      setIsLoading(false); // Set loading to false when there's an error
     }
   };
-  
 
   return (
     <div className="login-container">
@@ -64,6 +67,7 @@ const Login = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            disabled={isLoading}
           />
           <input
             type="password"
@@ -71,9 +75,16 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            disabled={isLoading}
           />
-          <button className="button-on" type="submit">
-            Login
+          <button className="button-on" type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <span className="loading-spinner">
+                <span className="spinner"></span> Logging in...
+              </span>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
         <p className="register-text">

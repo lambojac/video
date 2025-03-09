@@ -7,8 +7,8 @@ const UserSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
-    avatar: { type: String, default: "/default-avatar.jpg" },
-    banner: { type: String, default: "/default-banner.jpg" },
+    avatar: { type: String, default: "/avatar.jpg" },
+    banner: { type: String, default: "/banner.jpg" },
   
   notifications: [{
     type: { type: String, enum: ['video_tag', 'event', 'message'] },

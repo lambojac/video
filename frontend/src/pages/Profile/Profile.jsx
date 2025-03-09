@@ -307,25 +307,27 @@ const Profile = () => {
               </div>
             </div>
             
-            <div className="search-results">
-              {isLoading ? (
-                <p>Loading...</p>
-              ) : (
-                searchResults.length > 0 ? (
-                  searchResults.map(user => (
-                    <div 
-                      key={user._id}
-                      className="search-item"
-                      onClick={() => navigateToUserProfile(user._id)}
-                    >
-                      <span>{user.fullName}</span>
-                    </div>
-                  ))
+            {searchQuery.trim() !== "" && (
+              <div className="search-results">
+                {isLoading ? (
+                  <p>Loading...</p>
                 ) : (
-                  searchQuery && <p>No users found.</p>
-                )
-              )}
-            </div>
+                  searchResults.length > 0 ? (
+                    searchResults.map(user => (
+                      <div 
+                        key={user._id}
+                        className="search-item"
+                        onClick={() => navigateToUserProfile(user._id)}
+                      >
+                        <span>{user.fullName}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No users found.</p>
+                  )
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -334,17 +336,20 @@ const Profile = () => {
           {/* Private Videos Section */}
           <div className="videos-category">
             <div className="videos-header">
-              <h3>MY VIDEOS</h3>
-              <p className="video-category">PRIVATE VIDEOS</p>
+              <div>
+                <h3>MY VIDEOS</h3>
+                <p className="video-category">PRIVATE VIDEOS</p>
+              </div>
+              <div className="upload-action">
+                <button 
+                  className="btn upload-btn"
+                  onClick={() => setShowUploadModal(true)}
+                >
+                  <FaUpload /> UPLOAD VIDEOS
+                </button>
+              </div>
             </div>
-            <div className="upload-action">
-            <button 
-              className="btn upload-btn"
-              onClick={() => setShowUploadModal(true)}
-            >
-              <FaUpload /> UPLOAD VIDEOS
-            </button>
-          </div>
+            
             <div className="video-grid">
               {isLoading ? (
                 <p>Loading videos...</p>
@@ -401,7 +406,9 @@ const Profile = () => {
           {/* Annotated Private Videos Section - Replace Public Videos */}
           <div className="videos-category">
             <div className="videos-header">
-              <h3>ANNOTATED PRIVATE VIDEOS</h3>
+              <div>
+                <h3>ANNOTATED PRIVATE VIDEOS</h3>
+              </div>
             </div>
             
             <div className="video-grid">
