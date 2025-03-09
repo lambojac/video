@@ -1,12 +1,27 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate} from "react-router-dom";
 import { FaHome, FaUserCircle, FaBell, FaQuestionCircle, FaFont } from "react-icons/fa";
 import { MdOutlineVideoLibrary } from "react-icons/md";
 import { IoIosFootball } from "react-icons/io";
 import { GiBoxingGloveSurprise } from "react-icons/gi";
 import "./Dashboard.scss";
-
+import axios from "axios";
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      await axios.get("https://video-g4h9.onrender.com/api/users/logout", {}, { withCredentials: true }); // Call the backend logout API
+  
+      // ✅ Clear the token from localStorage
+      localStorage.removeItem("token");
+  
+      // 🔄 Redirect to the login page
+      navigate("/login");
+  
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
 
   return (
     <div className="dashboard">
@@ -22,6 +37,10 @@ const Dashboard = () => {
       </Link>
           <button className="help-btn">
             <FaQuestionCircle /> HELP
+          </button>
+           {/* Logout Button */}
+           <button className="logout-btn" onClick={handleLogout}>
+            LOGOUT
           </button>
         </div>
       </div>
