@@ -12,10 +12,10 @@ const Dashboard = () => {
     try {
       await axios.get("https://video-g4h9.onrender.com/api/users/logout", {}, { withCredentials: true }); // Call the backend logout API
   
-      // ✅ Clear the token from localStorage
+      //Clear the token from localStorage
       localStorage.removeItem("token");
   
-      // 🔄 Redirect to the login page
+      //Redirect to the login page
       navigate("/login");
   
     } catch (error) {

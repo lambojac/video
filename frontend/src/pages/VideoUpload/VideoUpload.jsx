@@ -225,7 +225,7 @@ const VideoUpload = () => {
           {/* Add Analysis button inside .video-card */}
           <div className="actions">
             <button
-              className="annotate-button"
+              className="tag-user"
               onClick={goToAnnotation}
               disabled={!selectedVideo} // ✅ Disable if no video is selected
             >
