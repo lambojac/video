@@ -509,6 +509,7 @@ const Annotation = () => {
         headers: {
           'Content-Type': 'application/json'
         },
+        referrerPolicy: "unsafe-url",
         body: JSON.stringify(payload),
       });
       
