@@ -59,7 +59,7 @@ export const annotateVideo = async (req, res) => {
       endTime: parseFloat(anno.endTime)
     }));
 
-    const pythonProcess = spawn('python3.10', [pythonScriptPath, tempVideoPath, outputPath, JSON.stringify(annotationsData)]);
+    const pythonProcess = spawn('python3', [pythonScriptPath, tempVideoPath, outputPath, JSON.stringify(annotationsData)]);
     
     pythonProcess.stdout.on('data', (data) => {
       console.log(`Python stdout: ${data}`);
