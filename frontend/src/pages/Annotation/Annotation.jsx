@@ -504,11 +504,12 @@ const Annotation = () => {
       };
       
       // Send to server
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/annotation/annotate`, {
+      const response = await fetch('https://video-g4h9.onrender.com/api/annotation/annotate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
+        referrerPolicy: "unsafe-url",
         body: JSON.stringify(payload),
       });
       
