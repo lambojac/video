@@ -28,7 +28,7 @@ const Annotation = () => {
   useEffect(() => {
     const fetchVideoDetails = async () => {
       try {
-        const response = await fetch(`https://video-g4h9.onrender.com/api/annotation/${id}`);
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/annotation/${id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch video details');
         }
@@ -504,7 +504,7 @@ const Annotation = () => {
       };
       
       // Send to server
-      const response = await fetch('https://video-g4h9.onrender.com/api/annotation/annotate', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/annotation/annotate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

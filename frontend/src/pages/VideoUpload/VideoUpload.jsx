@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
-import { FaHome, FaUserCircle, FaBell, FaPen } from "react-icons/fa";
+import { FaHome, FaUserCircle, FaBell, FaPen, FaFilm, FaCompressAlt } from "react-icons/fa";
 import { FiHelpCircle } from "react-icons/fi";
 import VideoTagModal from '../Modal/Modal';
 import "./VideoUpload.scss";
@@ -29,7 +29,31 @@ const VideoUpload = () => {
       navigate(`/annotation/${selectedVideo}`);
     }
   };
-
+  
+  // Function to navigate to comparison page - modified to work with both original and annotated videos
+  const goToComparison = async () => {
+    if (!selectedVideo) return;
+    
+    try {
+      // Find the selected video in our list
+      const selectedVideoData = videos.find(v => v._id === selectedVideo);
+      
+      if (selectedVideoData) {
+        // If it's an annotated video, navigate directly to comparison with its ID
+        if (selectedVideoData.isAnnotated && selectedVideoData.originalVideoId) {
+          navigate(`/comparison/${selectedVideoData._id}`);
+        } 
+        // If it's an original video with annotations, navigate using original ID
+        else if (selectedVideoData.hasAnnotations) {
+          navigate(`/comparison/${selectedVideoData._id}`);
+        } else {
+          alert("This video doesn't have an annotated version for comparison.");
+        }
+      }
+    } catch (error) {
+      console.error("Error navigating to comparison:", error);
+    }
+  };
 
   useEffect(() => {
     fetchVideos(currentPage);
@@ -38,7 +62,7 @@ const VideoUpload = () => {
   const fetchVideos = async (page) => {
     try {
       const response = await fetch(
-        `https://video-g4h9.onrender.com/api/video?page=${page}&limit=6&privacy=${privacy}`
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/api/video?page=${page}&limit=6&privacy=${privacy}`
       );
       const data = await response.json();
       setVideos(data.videos);
@@ -63,7 +87,7 @@ const VideoUpload = () => {
     formData.append('privacy', privacy);
 
     try {
-      const response = await fetch('https://video-g4h9.onrender.com/api/video/upload', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/video/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -82,11 +106,26 @@ const VideoUpload = () => {
       setLoading(false);
     }
   };
-  //taguser
+  
+  // Tag user function
   const handleTagUser = () => {
     if (selectedVideo) {
       setShowTagModal(true);
     }
+  };
+  
+  // Determine if comparison is possible for the selected video
+  const canCompareVideo = () => {
+    if (!selectedVideo) return false;
+    const video = videos.find(v => v._id === selectedVideo);
+    
+    // Can compare if it's an original video with annotations
+    if (video && video.hasAnnotations) return true;
+    
+    // Can also compare if it's an annotated video with an original
+    if (video && video.isAnnotated && video.originalVideoId) return true;
+    
+    return false;
   };
 
   return (
@@ -186,20 +225,27 @@ const VideoUpload = () => {
         <div className="video-grid">
           {videos.map((video) => (
             <div
-              className="video-card"
+              className={`video-card ${selectedVideo === video._id ? 'selected' : ''} ${video.hasAnnotations ? 'has-annotations' : ''} ${video.isAnnotated ? 'is-annotated' : ''}`}
               key={video._id}
-              onClick={() => handleVideoClick(video._id)} // ✅ Select video on click
-              style={{ cursor: 'pointer', border: selectedVideo === video._id ? '2px solid blue' : 'none' }}
+              onClick={() => handleVideoClick(video._id)}
             >
               <video src={video.url} controls />
               <div className="video-info">
                 <p>{video.title}</p>
                 <span className="privacy-badge">{video.privacy}</span>
+                {video.hasAnnotations && (
+                  <span className="annotation-badge">Has Annotations</span>
+                )}
+                {video.isAnnotated && (
+                  <span className="annotated-badge">Annotated Version</span>
+                )}
+                {video.originalVideoId && (
+                  <span className="original-badge">Has Original</span>
+                )}
               </div>
             </div>
           ))}
         </div>
-
 
         {totalPages > 1 && (
           <div className="pagination">
@@ -220,20 +266,32 @@ const VideoUpload = () => {
         )}
 
         <div className="actions">
-          <button className="tag-user" onClick={handleTagUser}
-            disabled={!selectedVideo}>TAG USER</button>
-          {/* Add Analysis button inside .video-card */}
-          <div className="actions">
-            <button
-              className="tag-user"
-              onClick={goToAnnotation}
-              disabled={!selectedVideo} // ✅ Disable if no video is selected
-            >
-              <FaPen /> Add Analysis
-            </button>
-          </div>
+          <button 
+            className="action-button tag-user" 
+            onClick={handleTagUser}
+            disabled={!selectedVideo}
+          >
+            TAG USER
+          </button>
+          
+          <button
+            className="action-button annotation-button"
+            onClick={goToAnnotation}
+            disabled={!selectedVideo}
+          >
+            <FaPen /> Add Analysis
+          </button>
+          
+          <button
+            className="action-button comparison-button"
+            onClick={goToComparison}
+            disabled={!canCompareVideo()}
+          >
+            <FaCompressAlt /> Compare Videos
+          </button>
         </div>
       </div>
+      
       {showTagModal && (
         <VideoTagModal
           videoId={selectedVideo}

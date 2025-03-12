@@ -77,18 +77,23 @@ export const annotateVideo = async (req, res) => {
       if (!fs.existsSync(outputPath) || fs.statSync(outputPath).size === 0) {
         return res.status(500).json({ message: 'Processed video file is empty or does not exist' });
       }
-
-      const ffmpegCommand = `ffmpeg -i ${outputPath} -c:v libx264 -c:a aac -strict experimental ${temp2VideoPath}`;
-      
-      await new Promise((resolve, reject) => {
-        exec(ffmpegCommand, (error, stdout, stderr) => {
-          if (error) {
-            reject(`Error processing video: ${stderr}`);
-          } else {
-            resolve(stdout);
-          }
+      try {
+        const ffmpegCommand = `ffmpeg -i ${outputPath} -c:v libx264 -c:a aac -strict experimental ${temp2VideoPath}`;
+        
+        await new Promise((resolve, reject) => {
+          exec(ffmpegCommand, (error, stdout, stderr) => {
+            if (error) {
+              reject(`Error processing video: ${stderr}`);
+            } else {
+              resolve(stdout);
+            }
+          });
         });
-      });
+        
+      } catch (error) {
+        console.error('Error processing video:', error);
+        throw new Error(`Video processing failed: ${error.message}`);
+      }
 
       const uploadResult = await cloudinary.uploader.upload(temp2VideoPath, {
         resource_type: 'video',
@@ -173,5 +178,64 @@ const downloadFromCloudinary = async (url, destination) => {
   } catch (error) {
     console.error('Error in downloadFromCloudinary:', error);
     throw error;
+  }
+};
+
+/**
+ * @route GET /api/annotation/:id/comparison
+ * @param {string} id - Video ID (can be either original or annotated video ID)
+ * @returns {Object} Video details with original and annotated URLs
+ */
+export const videoComparison = async (req, res) => {
+  try {
+    const videoId = req.params.id;
+    
+    // First, check if the provided ID is an annotated video
+    let annotatedVideo = await Video.findById(videoId);
+    let originalVideo;
+    
+    if (!annotatedVideo) {
+      return res.status(404).json({ message: 'Video not found' });
+    }
+    
+    // If this is an annotated video (has originalVideoId property)
+    if (annotatedVideo.isAnnotated && annotatedVideo.originalVideoId) {
+      // Get the original video
+      originalVideo = await Video.findById(annotatedVideo.originalVideoId);
+      
+      if (!originalVideo) {
+        return res.status(404).json({ message: 'Original video not found' });
+      }
+    } 
+    // If this is an original video
+    else {
+      originalVideo = annotatedVideo;
+      
+      // Find the annotated version of this original video
+      annotatedVideo = await Video.findOne({
+        originalVideoId: videoId,
+        isAnnotated: true
+      }).sort({ createdAt: -1 }); // Get the most recent annotated version
+      
+      if (!annotatedVideo) {
+        return res.status(404).json({
+          message: 'No annotated version found for this video'
+        });
+      }
+    }
+    
+    // Return data for comparison
+    return res.json({
+      title: originalVideo.title,
+      originalUrl: originalVideo.url,
+      annotatedUrl: annotatedVideo.url,
+      originalId: originalVideo._id,
+      annotatedId: annotatedVideo._id,
+      annotations: annotatedVideo.annotations || []
+    });
+    
+  } catch (error) {
+    console.error('Error fetching comparison data:', error);
+    return res.status(500).json({ message: 'Server error' });
   }
 };

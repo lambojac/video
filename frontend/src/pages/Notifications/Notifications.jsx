@@ -34,7 +34,7 @@ const Notifications = () => {
           throw new Error('No authentication token found');
         }
     
-        const response = await fetch(`https://video-g4h9.onrender.com/api/notification/notifications`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/notification/notifications`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

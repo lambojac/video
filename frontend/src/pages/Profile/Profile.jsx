@@ -33,7 +33,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch(`https://video-g4h9.onrender.com/api/users/`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/users/`, {
           method: "GET",
           credentials: "include",
           headers: {
@@ -71,7 +71,7 @@ const Profile = () => {
     try {
       // Modify the API endpoint to include the isAnnotated parameter
       const response = await fetch(
-        `https://video-g4h9.onrender.com/api/video?page=${page}&limit=3&privacy=${privacyType}&isAnnotated=${isAnnotated}`
+        `${process.env.REACT_APP_BACKEND_BASE_URL}/api/video?page=${page}&limit=3&privacy=${privacyType}&isAnnotated=${isAnnotated}`
       );
       const data = await response.json();
       setVideosFunction(data.videos);
@@ -86,7 +86,7 @@ const Profile = () => {
   const fetchSearchResults = async (query) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`https://video-g4h9.onrender.com/api/users/search?search=${query}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/users/search?search=${query}`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('token')}`,
@@ -134,7 +134,7 @@ const Profile = () => {
     formData.append(type, file);
   
     try {
-      const response = await fetch(`https://video-g4h9.onrender.com/api/upload/${type}/${userId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/upload/${type}/${userId}`, {
         method: "POST",
         body: formData,
         credentials: 'include',
@@ -182,7 +182,7 @@ const Profile = () => {
     formData.append('privacy', privacy);
 
     try {
-      const response = await fetch('https://video-g4h9.onrender.com/api/video/upload', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_BASE_URL}/api/video/upload`, {
         method: 'POST',
         body: formData,
       });
