@@ -117,10 +117,10 @@ const Notifications = () => {
               <UserCircle size={20} />
             </button>
           </Link>
-          <button className="btn-help">
+{/*           <button className="btn-help">
             <HelpCircle size={20} />
             <span>HELP</span>
-          </button>
+          </button> */}
         </div>
       </header>
       <main className="main-content">
