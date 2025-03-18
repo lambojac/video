@@ -35,9 +35,9 @@ const Dashboard = () => {
       <Link to="/profile/:userId">
         <FaUserCircle className="icon" />
       </Link>
-          <button className="help-btn">
+{/*           <button className="help-btn">
             <FaQuestionCircle /> HELP
-          </button>
+          </button> */}
            {/* Logout Button */}
            <button className="logout-btn" onClick={handleLogout}>
             LOGOUT
