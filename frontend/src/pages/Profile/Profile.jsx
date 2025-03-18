@@ -240,9 +240,9 @@ const Profile = () => {
               <FaUserCircle className="icon" />
             </div>
           </Link>
-          <button className="help-btn">
+{/*           <button className="help-btn">
             <FaQuestionCircle className="help-icon" /> HELP
-          </button>
+          </button> */}
         </div>
       </div>
 
