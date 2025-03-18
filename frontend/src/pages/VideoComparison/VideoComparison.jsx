@@ -110,7 +110,7 @@ const VideoComparison = () => {
   
   // Go back to previous page
   const goBack = () => {
-    navigate('/uploads');
+    navigate('/upload');
   };
   
   if (loading) {
