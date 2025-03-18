@@ -141,7 +141,7 @@ const VideoUpload = () => {
           <Link to="/notifications">
             <FaBell className="icon" />
           </Link>
-          <FiHelpCircle className="icon" /> HELP
+{/*           <FiHelpCircle className="icon" /> HELP */}
         </div>
       </header>
 
