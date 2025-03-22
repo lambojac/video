@@ -164,7 +164,7 @@ const Annotation = () => {
     
     // Calculate bubble position (centered at arrow start)
     const bubbleX = anno.arrowStart.x - bubbleWidth / 2;
-    const bubbleY = anno.arrowStart.y - bubbleHeight / 2;
+    const bubbleY = anno.arrowStart.y - bubbleHeight;
     
     // Draw bubble background with slightly darker color and higher opacity
     ctx.current.fillStyle = 'rgba(64, 64, 64, 0.9)';
@@ -504,7 +504,7 @@ const Annotation = () => {
       };
       
       // Send to server
-      const response = await fetch('https://video-g4h9.onrender.com/api/annotation/annotate', {
+      const response = await fetch('http://localhost:2000/api/annotation/annotate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
