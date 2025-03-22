@@ -504,7 +504,7 @@ const Annotation = () => {
       };
       
       // Send to server
-      const response = await fetch('http://localhost:2000/api/annotation/annotate', {
+      const response = await fetch('https://video-g4h9.onrender.com/api/annotation/annotate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
